@@ -1,6 +1,5 @@
 from typing import OrderedDict
 
-from fastapi import HTTPException
 from fastapi import APIRouter, status
 from fastapi.responses import JSONResponse
 
@@ -49,11 +48,14 @@ async def get_books() -> OrderedDict[int, Book]:
     return db.get_books()
 
 
-@router.get("/{book_id}", response_model=Book, status_code=status.HTTP_200_OK)
-async def get_book(book_id: int) -> Book:
+@router.get("/{book_id}")
+async def get_book(book_id: int):
     book = db.books.get(book_id)
     if not book:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Book not found")
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"message": "Book not found"}
+        )
     return book
 
 
